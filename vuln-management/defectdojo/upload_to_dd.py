@@ -2,6 +2,11 @@ import requests
 import json
 import os
 
+required_vars = ["DOJO_URL", "DOJO_API_KEY", "DOJO_PRODUCT_NAME"]
+for var in required_vars:
+    if not os.getenv(var):
+        raise SystemExit(f"Missing required environment variable: {var}")
+
 DOJO_URL = os.getenv("DOJO_URL")
 API_KEY = os.getenv("DOJO_API_KEY")
 PRODUCT_NAME = os.getenv("DOJO_PRODUCT_NAME")
@@ -33,8 +38,8 @@ def create_engagement(product_id):
         data={
             "product": product_id,
             "name": "CI/CD Scan",
-            "target_start": "2024-01-01",
-            "target_end": "2024-12-31",
+            "target_start": "2024-01-01", #example
+            "target_end": "2024-12-31",   #example
             "status": "In Progress"
         }
     )
