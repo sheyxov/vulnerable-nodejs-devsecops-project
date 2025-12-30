@@ -16,7 +16,7 @@ The scan target is intentionally **not hardcoded**.
 
 The application URL must be provided via a CI/CD variable:
 
-DAST_TARGET=http://<application-host>:<port>
+DAST_TARGET=http://(app-host):(port)
 
 
 This design allows the pipeline to be reused across different environments
