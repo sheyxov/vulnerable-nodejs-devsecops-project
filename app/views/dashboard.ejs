@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Vulnerable App</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <h1>Welcome, <%= user.username %>!</h1>
+            <div class="nav-links">
+                <a href="/posts">View All Posts</a>
+                <% if (user.role === 'admin') { %>
+                    <a href="/admin">Admin Panel</a>
+                <% } %>
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
+
+        <div class="dashboard-content">
+            <div class="profile-section">
+                <h2>Profile Information</h2>
+                <div class="profile-info">
+                    <p><strong>Username:</strong> <%= user.username %></p>
+                    <p><strong>Email:</strong> <%= user.email %></p>
+                    <p><strong>Role:</strong> <%= user.role %></p>
+                    <% if (user.bio) { %>
+                        <p><strong>Bio:</strong> <%- user.bio %></p>
+                    <% } %>
+                </div>
+                
+                <form method="POST" action="/update-profile" class="profile-form">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="<%= user.email %>">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Bio:</label>
+                        <textarea id="bio" name="bio" rows="3" placeholder="Tell us about yourself..."><%= user.bio || '' %></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Update Profile</button>
+                </form>
+            </div>
+
+            <div class="create-post">
+                <h2>Create New Post</h2>
+                <form method="POST" action="/create-post">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="content">Content:</label>
+                        <textarea id="content" name="content" rows="4" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Create Post</button>
+                </form>
+            </div>
+
+            <!-- User Posts -->
+            <div class="posts-section">
+                <h2>Your Posts</h2>
+                <% if (posts.length === 0) { %>
+                    <p>No posts yet. Create your first post above!</p>
+                <% } else { %>
+                    <% posts.forEach(post => { %>
+                        <div class="post">
+                            <h3><%- post.title %></h3>
+                            <div class="post-content"><%- post.content %></div>
+                            <div class="post-meta">
+                                <small>Created: <%= post.created_at %></small>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
