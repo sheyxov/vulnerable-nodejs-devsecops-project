@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  app:
+    image: <your-app-image>
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: <db-host>
+      DB_PORT: <db-port>
+      DB_NAME: <db-name>
+      DB_USER: <db-user>
+      DB_PASSWORD: <db-password>
+
+  db:
+    image: <database-image>
+    environment:
+      MYSQL_DATABASE: <database-name>
