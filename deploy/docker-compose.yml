@@ -1,0 +1,42 @@
+# ⚠️ WARNING:
+# This Docker Compose file is intended for LOCAL / LAB USE ONLY.
+# It contains intentionally weak configurations for security testing.
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: vulnerable_app
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: appuserpass
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+
+  app:
+    build: .
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: vulnerable_app
+      DB_USER: appuser
+      DB_PASSWORD: appuserpass
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    entrypoint: >
+      sh -c "
+        # DB gəlib açılana qədər gözlə
+        while ! nc -z $${DB_HOST:-db} $${DB_PORT:-3306}; do
+          echo \"Waiting for MySQL at $${DB_HOST:-db}:$${DB_PORT:-3306}...\"
+          sleep 2
+        done
+        echo 'MySQL is up — starting app'
+        npm start
+      "
