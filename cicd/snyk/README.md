@@ -13,7 +13,7 @@ Snyk is used to:
 
 To enable this stage, the following CI/CD variable must be configured:
 
-
+SNYK_TOKEN
 ---
 
 ## Output
