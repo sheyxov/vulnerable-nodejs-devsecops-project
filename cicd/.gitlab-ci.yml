@@ -1,0 +1,97 @@
+stages:
+  - sast
+  - sca
+  - secret_scan
+  - build
+  - dast
+  - defectdojo
+
+variables:
+  SNYK_PATH: "/root/.snyk"
+  GITLEAKS_PATH: "/usr/local/bin/gitleaks"
+  DAST_TARGET: "http://CHANGE_ME"
+  DOCKER_IMAGE_NAME: "CHANGE_ME_IMAGE"
+
+# =========================
+# SAST - Semgrep
+# =========================
+sast_semgrep:
+  stage: sast
+  image: returntocorp/semgrep
+  script:
+    - semgrep --config "p/default" --sarif -o semgrep.sarif .
+  artifacts:
+    when: always
+    paths:
+      - semgrep.sarif
+  allow_failure: true
+
+# =========================
+# SCA - Snyk
+# =========================
+sca_snyk:
+  stage: sca
+  image: node:20
+  script:
+    - npm install
+    - npm install -g snyk
+    - snyk auth $SNYK_TOKEN
+    - snyk test --json-file-output=snyk-report.json || true
+  artifacts:
+    when: always
+    paths:
+      - snyk-report.json
+  allow_failure: true
+
+# =========================
+# Secret Scan - Gitleaks
+# =========================
+secret_scan:
+  stage: secret_scan
+  image: zricethezav/gitleaks:latest
+  script:
+    - gitleaks detect --no-git --report-format json --report-path gitleaks-report.json || true
+  artifacts:
+    when: always
+    paths:
+      - gitleaks-report.json
+  allow_failure: true
+
+# =========================
+# Build (Optional)
+# =========================
+build_docker_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - echo "Docker build step (optional)"
+    - docker build -t $DOCKER_IMAGE_NAME .
+  rules:
+    - when: manual
+
+# =========================
+# DAST - OWASP ZAP
+# =========================
+dast_scan:
+  stage: dast
+  image: zaproxy/zap-stable
+  script:
+    - zap-baseline.py -t $DAST_TARGET -x zap_report.xml || true
+  artifacts:
+    when: always
+    paths:
+      - zap_report.xml
+  allow_failure: true
+
+# =========================
+# DefectDojo Import (Optional)
+# =========================
+defectdojo_upload:
+  stage: defectdojo
+  image: python:3.9
+  script:
+    - echo "DefectDojo import is optional and requires CI variables"
+  rules:
+    - when: manual
