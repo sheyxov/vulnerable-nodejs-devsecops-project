@@ -12,7 +12,7 @@ Semgrep is used to analyze source code for:
 ## Current Setup
 
 The pipeline uses the default Semgrep ruleset:
-
+semgrep --config p/default
 
 This provides broad coverage for common security issues.
 
